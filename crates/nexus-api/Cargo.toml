@@ -18,7 +18,7 @@ utoipa.workspace = true
 sqlx.workspace = true
 tokio.workspace = true
 axum = "0.8"
-utoipa-swagger-ui = { version = "9", features = ["axum", "vendored"] }
+utoipa-swagger-ui = { version = "10", features = ["axum", "vendored"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tower-http = { version = "0.6", features = ["trace", "set-header", "timeout"] }
