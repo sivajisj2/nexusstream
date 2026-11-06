@@ -1,0 +1,8 @@
+{
+  "events": 1000,
+  "concurrency": 8,
+  "elapsed_seconds": 0.92,
+  "events_per_second": 1086.52,
+  "p50_ms": 5.97,
+  "p95_ms": 11.95
+}

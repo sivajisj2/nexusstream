@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_DB: nexus
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/setup.sh first}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - nexus-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgres://nexus:${POSTGRES_PASSWORD}@postgres:5432/nexus
+      NEXUS_API_KEY: ${NEXUS_API_KEY:?Run scripts/setup.sh first}
+      NEXUS_BIND: 0.0.0.0:8080
+      RUST_LOG: info
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    init: true
+    read_only: true
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: ["ALL"]
+    stop_grace_period: 30s
+    restart: unless-stopped
+volumes:
+  nexus-data:

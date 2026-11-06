@@ -1,0 +1,28 @@
+[package]
+name = "nexus-api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+nexus-protocol = { path = "../nexus-protocol" }
+nexus-store = { path = "../nexus-store" }
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+utoipa.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+axum = "0.8"
+utoipa-swagger-ui = { version = "9", features = ["axum", "vendored"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tower-http = { version = "0.6", features = ["trace", "set-header", "timeout"] }
+subtle = "2"
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+http-body-util = "0.1"

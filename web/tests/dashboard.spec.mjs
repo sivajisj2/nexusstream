@@ -1,0 +1,36 @@
+import { test, expect } from '@playwright/test';
+test('operator can connect, publish, inspect safely and filter events', async ({page})=>{
+  const key=process.env.NEXUS_API_KEY;
+  if(!key)throw new Error('Set NEXUS_API_KEY for the running test instance');
+  const errors=[];page.on('pageerror',error=>errors.push(error.message));
+  await page.goto('/');
+  await page.getByLabel('Instance access key').fill(key);
+  await page.getByRole('button',{name:'Connect',exact:true}).click();
+  await expect(page.locator('#status')).toContainText('Connected');
+  const source=`browser-test-${Date.now()}`;
+  await page.locator('#pub-source').fill(source);
+  await page.locator('#payload').fill('{"verified":true,"untrusted":"<img src=x onerror=alert(1)>"}');
+  await page.getByRole('button',{name:'Publish event',exact:false}).click();
+  await expect(page.locator('#receipt')).toContainText('1 accepted');
+  await expect(page.locator('#refresh')).toBeEnabled();
+  await page.getByRole('button',{name:'Inspect ↗'}).first().click();
+  await expect(page.locator('#detail-content')).toContainText('verified');
+  await expect(page.locator('#detail-content img')).toHaveCount(0);
+  await page.getByRole('button',{name:'Close',exact:true}).click();
+  await page.getByRole('textbox',{name:'Filter by source',exact:true}).fill(source);
+  await page.getByRole('button',{name:'Apply filters'}).click();
+  await expect(page.locator('#events')).toContainText(source);
+  await expect(page.locator('#refresh')).toBeEnabled();
+  await expect(page.locator('#events tr')).toHaveCount(1);
+  await page.setViewportSize({width:390,height:844});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
+  await page.reload();
+  await expect(page.locator('#key')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText('Disconnected');
+  expect(errors).toEqual([]);
+});
+test('Swagger UI renders the generated API',async({page})=>{
+  await page.goto('/docs/');
+  await expect(page.getByRole('heading',{name:'NexusStream API',exact:false})).toBeVisible();
+  await expect(page.locator('.opblock')).not.toHaveCount(0);
+});
