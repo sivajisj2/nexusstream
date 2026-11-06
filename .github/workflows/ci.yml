@@ -20,7 +20,7 @@ jobs:
       DATABASE_URL: postgres://nexus:ci-only-password@localhost:5432/nexus
       NEXUS_API_KEY: ci-only-key-with-at-least-32-characters
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: 1.99.1
